@@ -1,0 +1,8 @@
+FROM APACHE/AIRFLOW:2.7.1
+
+RUN pi install -U pip --upgrade pip
+
+COPY requirements.txt /requirements.txt
+
+RUN pip install --no-cache-dir --user -r /requirements.txt
+

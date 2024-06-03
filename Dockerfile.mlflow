@@ -1,0 +1,17 @@
+FROM python:3.10-slim-buster
+
+# SET THE WORKING DIRECTORY
+WORKDIR /mlflow
+
+# SET UP THE SQLITE SERVER DATABASE URI AS AN ENVINONMENT VARIABLEE
+ENV BACKEND_URI sqlite:///mlflow.db
+
+# Install python packages
+RUN pip install mlflow
+
+
+# EXPOSE SERVER ON PORT 5000
+EXPOSE 5000
+
+# COMMAND RUN MLFLOW SERVER
+CMD mlflow ui --backend-store-uri $BACKEND_URI --host 0.0.0.0 --no-conda
