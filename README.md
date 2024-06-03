@@ -58,7 +58,7 @@ flowchart LR
 
 %% Edge connections between nodes
     A -- Consume la API --> B
-    B -- Carga el modelo desde --> C
+    C -- Carga el modelo desde --> B
 
 %% Individual node styling. Try the visual editor toolbar for easier styling!
     style A color:#FFFFFF, fill:#AA00FF, stroke:#AA00FF
@@ -69,23 +69,36 @@ flowchart LR
 ### 1.2.1 MLflow para Tracking:
 Se decidio usar MLflow solo para tracking y no para el despliegue debido a:
 
-    - Propósito Específico: MLflow está diseñado específicamente para el seguimiento y gestión del ciclo de vida de los experimentos de machine learning, incluyendo la experimentación, la reproducción de resultados y la comparación de modelos.
-    - Versionado y Registro de Modelos: MLflow facilita el registro, versionado y almacenamiento de modelos, además de capturar métricas, parámetros y artefactos asociados a cada experimento.
-    - Interfaz de Usuario: Ofrece una interfaz web intuitiva que permite visualizar y comparar experimentos de manera sencilla.    
-    - Uso Interno: MLflow está diseñado principalmente para ser utilizado en entornos internos durante el desarrollo y experimentación de modelos. Por lo tanto, no está optimizado para el control de acceso granular y la exposición a clientes externos.
-    - Enfoque en Tracking: Mientras que MLflow es excelente para gestionar el ciclo de vida de los experimentos, no está optimizado para manejar solicitudes de alta frecuencia y baja latencia, como las que se esperan de una API en producción.
-    - Carga y Recursos: Su infraestructura no está diseñada para soportar cargas intensivas de tráfico externo.
+- Propósito Específico: MLflow está diseñado específicamente para el seguimiento y gestión del ciclo de vida de los experimentos de machine learning, incluyendo la experimentación, la reproducción de resultados y la comparación de modelos.
+
+- Versionado y Registro de Modelos: MLflow facilita el registro, versionado y almacenamiento de modelos, además de capturar métricas, parámetros y artefactos asociados a cada experimento.
+
+- Interfaz de Usuario: Ofrece una interfaz web intuitiva que permite visualizar y comparar experimentos de manera sencilla.    
+
+- Uso Interno: MLflow está diseñado principalmente para ser utilizado en entornos internos durante el desarrollo y experimentación de modelos. Por lo tanto, no está optimizado para el control de acceso granular y la exposición a clientes externos.
+
+- Enfoque en Tracking: Mientras que MLflow es excelente para gestionar el ciclo de vida de los experimentos, no está optimizado para manejar solicitudes de alta frecuencia y baja latencia, como las que se esperan de una API en producción.
+
+- Carga y Recursos: Su infraestructura no está diseñada para soportar cargas intensivas de tráfico externo.
 
 ### 1.2.2 FastAPI para Despliegue:
 
 Se decidio usar FastAPI para el despliegue debido a:
-    - Desempeño y Escalabilidad: FastAPI es conocido por su alto rendimiento y capacidad de manejar muchas solicitudes concurrentes, lo que es crucial para la fase de despliegue de un modelo.
-    - Flexibilidad: Permite crear APIs RESTful rápidas y eficientes, integrándose fácilmente con otras tecnologías y servicios.
-    - Facilidad de Uso: Ofrece una sintaxis sencilla y soporta la generación automática de documentación de API, lo que facilita el mantenimiento y la colaboración.    
-    - Autenticación y Autorización: FastAPI permite la implementación de diversas estrategias de autenticación (OAuth2, JWT, etc.) y autorización, proporcionando un control de acceso robusto y seguro.
-    - Configuración de Seguridad: Es más adecuado para configurar certificados SSL/TLS y gestionar conexiones seguras, algo crucial cuando se expone una API a usuarios externos.
-    - Asincronía y Concurrencia: FastAPI utiliza ASGI (Asynchronous Server Gateway Interface) para manejar solicitudes de manera asíncrona, permitiendo un manejo eficiente de múltiples conexiones concurrentes.
-    - Despliegue y Escalado: Es más sencillo desplegar FastAPI en servicios de orquestación y escalado automático como ElasticBeanstalk, lo que garantiza alta disponibilidad y balanceo de carga.
+
+- Desempeño y Escalabilidad: FastAPI es conocido por su alto rendimiento y capacidad de manejar muchas solicitudes concurrentes, lo que es crucial para la fase de despliegue de un modelo.
+
+- Flexibilidad: Permite crear APIs RESTful rápidas y eficientes, integrándose fácilmente con otras tecnologías y servicios.
+
+- Facilidad de Uso: Ofrece una sintaxis sencilla y soporta la generación automática de documentación de API, lo 
+que facilita el mantenimiento y la colaboración.    
+
+- Autenticación y Autorización: FastAPI permite la implementación de diversas estrategias de autenticación (OAuth2, JWT, etc.) y autorización, proporcionando un control de acceso robusto y seguro.
+
+- Configuración de Seguridad: Es más adecuado para configurar certificados SSL/TLS y gestionar conexiones seguras, algo crucial cuando se expone una API a usuarios externos.
+
+- Asincronía y Concurrencia: FastAPI utiliza ASGI (Asynchronous Server Gateway Interface) para manejar solicitudes de manera asíncrona, permitiendo un manejo eficiente de múltiples conexiones concurrentes.
+
+- Despliegue y Escalado: Es más sencillo desplegar FastAPI en servicios de orquestación y escalado automático como ElasticBeanstalk, lo que garantiza alta disponibilidad y balanceo de carga.
 
 # 2. Instalación
 
