@@ -32,20 +32,20 @@ El patrón Singleton y el patrón Flyweight tienen propósitos diferentes y se u
 
 ### 1.1.1 Singleton:
 
-    - Propósito: Garantizar que una clase tenga una única instancia y proporcionar un punto de acceso global a esa instancia.
-    - Uso: Es adecuado para gestionar recursos que deben ser únicos en el sistema, como la carga de un modelo de machine learning que solo necesita ser cargado una vez y reutilizado en todas las solicitudes.
+- Propósito: Garantizar que una clase tenga una única instancia y proporcionar un punto de acceso global a esa instancia.
+- Uso: Es adecuado para gestionar recursos que deben ser únicos en el sistema, como la carga de un modelo de machine learning que solo necesita ser cargado una vez y reutilizado en todas las solicitudes.
 
 ### 1.1.2 Flyweight:
 
-    - Propósito: Reducir el uso de memoria compartiendo la mayor cantidad de datos posible con objetos similares.
-    - Uso: Es adecuado cuando se necesita manejar una gran cantidad de objetos similares que comparten datos comunes, lo cual no es exactamente el caso aquí.
+- Propósito: Reducir el uso de memoria compartiendo la mayor cantidad de datos posible con objetos similares.
+- Uso: Es adecuado cuando se necesita manejar una gran cantidad de objetos similares que comparten datos comunes, lo cual no es exactamente el caso aquí.
 
 ### 1.1.3 En resumen
 Para desplegar un modelo de machine learning, el Singleton parece más apropiado por las siguientes razones:
 
-    - Única Instancia del Modelo: El modelo de machine learning debe cargarse una sola vez y reutilizarse, evitando recargas innecesarias que pueden ser costosas en términos de tiempo y recursos.
-    - Acceso Global: El Singleton proporciona un punto de acceso global a la instancia del modelo, lo cual es ideal para servir predicciones a múltiples solicitudes concurrentes.
-    - Mantenimiento: El uso de Singleton puede ser más apropiado en aplicaciones más grandes y complejas donde el control y la encapsulación son cruciales. 
+- Única Instancia del Modelo: El modelo de machine learning debe cargarse una sola vez y reutilizarse, evitando recargas innecesarias que pueden ser costosas en términos de tiempo y recursos.
+- Acceso Global: El Singleton proporciona un punto de acceso global a la instancia del modelo, lo cual es ideal para servir predicciones a múltiples solicitudes concurrentes.
+- Mantenimiento: El uso de Singleton puede ser más apropiado en aplicaciones más grandes y complejas donde el control y la encapsulación son cruciales. 
 
 ## 1.2 Arquitectura
 
@@ -58,7 +58,7 @@ flowchart LR
 
 %% Edge connections between nodes
     A -- Consume la API --> B
-    C -- Carga el modelo desde --> B
+    B -- Obtiene el modelo --> C
 
 %% Individual node styling. Try the visual editor toolbar for easier styling!
     style A color:#FFFFFF, fill:#AA00FF, stroke:#AA00FF
@@ -70,15 +70,10 @@ flowchart LR
 Se decidio usar MLflow solo para tracking y no para el despliegue debido a:
 
 - Propósito Específico: MLflow está diseñado específicamente para el seguimiento y gestión del ciclo de vida de los experimentos de machine learning, incluyendo la experimentación, la reproducción de resultados y la comparación de modelos.
-
 - Versionado y Registro de Modelos: MLflow facilita el registro, versionado y almacenamiento de modelos, además de capturar métricas, parámetros y artefactos asociados a cada experimento.
-
 - Interfaz de Usuario: Ofrece una interfaz web intuitiva que permite visualizar y comparar experimentos de manera sencilla.    
-
 - Uso Interno: MLflow está diseñado principalmente para ser utilizado en entornos internos durante el desarrollo y experimentación de modelos. Por lo tanto, no está optimizado para el control de acceso granular y la exposición a clientes externos.
-
 - Enfoque en Tracking: Mientras que MLflow es excelente para gestionar el ciclo de vida de los experimentos, no está optimizado para manejar solicitudes de alta frecuencia y baja latencia, como las que se esperan de una API en producción.
-
 - Carga y Recursos: Su infraestructura no está diseñada para soportar cargas intensivas de tráfico externo.
 
 ### 1.2.2 FastAPI para Despliegue:
@@ -86,18 +81,12 @@ Se decidio usar MLflow solo para tracking y no para el despliegue debido a:
 Se decidio usar FastAPI para el despliegue debido a:
 
 - Desempeño y Escalabilidad: FastAPI es conocido por su alto rendimiento y capacidad de manejar muchas solicitudes concurrentes, lo que es crucial para la fase de despliegue de un modelo.
-
 - Flexibilidad: Permite crear APIs RESTful rápidas y eficientes, integrándose fácilmente con otras tecnologías y servicios.
-
 - Facilidad de Uso: Ofrece una sintaxis sencilla y soporta la generación automática de documentación de API, lo 
 que facilita el mantenimiento y la colaboración.    
-
 - Autenticación y Autorización: FastAPI permite la implementación de diversas estrategias de autenticación (OAuth2, JWT, etc.) y autorización, proporcionando un control de acceso robusto y seguro.
-
 - Configuración de Seguridad: Es más adecuado para configurar certificados SSL/TLS y gestionar conexiones seguras, algo crucial cuando se expone una API a usuarios externos.
-
 - Asincronía y Concurrencia: FastAPI utiliza ASGI (Asynchronous Server Gateway Interface) para manejar solicitudes de manera asíncrona, permitiendo un manejo eficiente de múltiples conexiones concurrentes.
-
 - Despliegue y Escalado: Es más sencillo desplegar FastAPI en servicios de orquestación y escalado automático como ElasticBeanstalk, lo que garantiza alta disponibilidad y balanceo de carga.
 
 # 2. Instalación
