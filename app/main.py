@@ -16,7 +16,11 @@ from modelos import ModelSingleton
 from base_models import Feature, FeatureWithTrue
 
 # Crear la aplicación FastAPI
+## Crear la documentación con un archivo si existe
 description_file = ""
+if os.path.isfile('redoc.md'):
+    with open('redoc.md') as f:
+        description_file = f.read()
 
 class Settings(BaseSettings):
     app_name: str = "Reggaeton Classifier API"
@@ -67,8 +71,11 @@ async def root(request: Request):
 
 @limiter.limit("60/minute")
 @app.post("/predict/")
-async def predict(request: Request, feature:Feature, transform:bool = True):
+async def predict(request: Request, feature:Feature, transform:bool = True, apikey:str=""):
     """Endpoint for use the Model of MLFlow, transform on False only for testing purporse"""
+    # For falta de tiempo, solo se usara una apikey fija, se recomienda usar token o un administrador
+    if apikey != "kXwagyJkMH0Q3fT3MorqmRupqpjq1FCsVijy2P3nwrQQpExcWl":
+        return JSONResponse({"status": "Online" if settings.flag_run else "Offline","detail":"The credencials is not valid"}, status_code=401)
     try:
         model_instance = ModelSingleton(MODEL_URI)
 
@@ -97,15 +104,15 @@ async def predict(request: Request, feature:Feature, transform:bool = True):
         settings.msg="Can't load MLflow Model"
         return JSONResponse({"status": "Online" if settings.flag_run else "Offline","detail":str(e)}, status_code=500)
 
-@app.post("/retrain-model")
-async def retrain_model(new_dataset: list, secure_password:str=''):
-    """Endpoint for use the Model of MLFlow, transform on False only for testing purporse"""
+# @app.post("/retrain-model")
+# async def retrain_model(new_dataset: list, secure_password:str=''):
+#     """Endpoint for use the Model of MLFlow, transform on False only for testing purporse"""
     
-    # Registrar nuevo modelo en MLflow
-    new_model = SimpleRegressionModel()
-    register_model(new_model, model_path)
+#     # Registrar nuevo modelo en MLflow
+#     new_model = SimpleRegressionModel()
+#     register_model(new_model, model_path)
     
-    # Evaluar drift de datos
-    evaluate_data_drift(mlflow.active_run().info.run_id, new_data)
+#     # Evaluar drift de datos
+#     evaluate_data_drift(mlflow.active_run().info.run_id, new_data)
     
-    return {"message": "Model retrained and evaluated for data drift."}
+#     return {"message": "Model retrained and evaluated for data drift."}
