@@ -2,20 +2,6 @@ version: '3.7'
 
 services:
 
-    # db:
-    #     restart: always
-    #     image: mysql/mysql-server@sha256:5b40d96b11333570143d98d3a74100fefadb9abb17b27a95dbc9ad33544ec142
-    #     container_name: mlflow_db
-    #     ports:
-    #         - "3306:3306"
-    #     environment:
-    #         - MYSQL_DATABASE=${MYSQL_DATABASE}
-    #         - MYSQL_USER=${MYSQL_USER}
-    #         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    #         - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-    #     volumes:
-    #         - dbdata:/var/lib/mysql
-
     mlflow:
       build:
         context: .
@@ -24,20 +10,17 @@ services:
         - "5000:5000"
       volumes:
         - mlflow-data:/mlflow
-    # mlflow-model:
-    #   build:
-    #     context: .
-    #     dockerfile: Dockerfile.mlflow
-      
-    #   # image: ubuntu/mlflow:2.1.1_1.0-22.04
-    #   command: ["mlflow", "models", "serve", "-m", "models:/Reggaeton_Classifier_V1.0/latest", "-p", "5001", "-h", "0.0.0.0","--no-conda"]
-    #   environment:
-    #     # MLFLOW_SERVER_FILE_STORE: /opt/mlflow/filestore
-    #     MLFLOW_TRACKING_URI: http://mlflow:5000
-    #   ports:
-    #     - "5001:5001"
-    #   depends_on:
-    #     - mlflow
+
+    api:
+      build:
+        context: app
+      environment:
+        MLFLOW_URI: http://mlflow:5000
+        MODEL_URI: models:/Reggaeton_Classifier_V1.0/latest
+      ports:
+      - "8001:15400"
+      depends_on:
+        - mlflow
 volumes:
   mlflow-data:
   postgres-db-volume:

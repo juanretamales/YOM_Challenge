@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 import json
 
 from main import app
-from modelos import ModelSingleton
+from model_instances import ModelSingleton
 
 # Cliente para hacer las pruebas                                                                                                                                                                                                
 client = TestClient(app)
@@ -43,7 +43,7 @@ def test_inference_with_transform():
 
         # Extraer las predicciones del JSON de respuesta
         json_response = response.json()
-        y_pred.append(json_response['class'])
+        y_pred.append(json_response['id'])
         y_val.append(row['reggaeton'])
         # Calcular métricas (opcional)
     

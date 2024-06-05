@@ -1,26 +1,20 @@
 # YOM Challenge
 
-El objetivo de esta prueba es entender tus habilidades para tomar un modelo hecho en local
-por un Data Scientist y dejarlo en un ambiente simulado de producción.
+El objetivo de esta prueba es entender tus habilidades para tomar un modelo hecho en localpor un Data Scientist y dejarlo en un ambiente simulado de producción.
+
 Los aspectos que evaluaremos son:
 ● Calidad del código (refactorización, orden, lógica, uso de patrones de diseño, etc)
-● Capacidad de implementar herramientas que permitan aplicar los principios de ML-Ops
-al proyecto en producción (recomendamos Neptune o ML Flow)
-● Uso de alguna herramienta que permita contener el ambiente creado para la ejecución y
-hacerlo reproducible fácilmente para alguien que quiera ejecutarlo
+● Capacidad de implementar herramientas que permitan aplicar los principios de ML-Ops al proyecto en producción (recomendamos Neptune o ML Flow)
+● Uso de alguna herramienta que permita contener el ambiente creado para la ejecución y hacerlo reproducible fácilmente para alguien que quiera ejecutarlo
 ● Documentación clara y fácil de leer
+
 Tienes bonus si:
-● Específicas cómo vas a abordar la interacción del modelo con el mundo real y nos
-explicas cómo vas a prevenir la degradación del modelo
-● Creas mecanismos de monitoreo que permitan alertar cuando exista un deterioro del
-modelo
+● Específicas cómo vas a abordar la interacción del modelo con el mundo real y nos explicas cómo vas a prevenir la degradación del modelo
+● Creas mecanismos de monitoreo que permitan alertar cuando exista un deterioro del modelo
 ● Usas herramientas de automatización de creación de infraestructura
 
-La prueba consiste en tomar este challenge realizado para una prueba técnica hace varios
-años y modificarlo para que cumpla con los requerimientos presentados anteriormente.
-El objetivo del challenge inicial está especificado aquí, pero recuerda que tu objetivo no es
-resolver el problema de modelamiento sino que tomar lo que hizo este DS junior y dejarlo en
-algo que pueda ser pasado a producción.
+La prueba consiste en tomar este challenge realizado para una prueba técnica https://github.com/iair/Spike_Challenge/tree/master hace varios años y modificarlo para que cumpla con los requerimientos presentados anteriormente.
+El objetivo del challenge inicial está especificado aquí, pero recuerda que tu objetivo no es resolver el problema de modelamiento sino que tomar lo que hizo este DS junior y dejarlo en algo que pueda ser pasado a producción.
 
 # 1. Contexto
 
@@ -93,9 +87,10 @@ que facilita el mantenimiento y la colaboración.
 
 Se recomienda el uso de Docker, para ello instalarlo previamente
 
-1. ```docker-compose up -d``` Para iniciar el entorno con los requisitos, se opto por docker-compose y no solo Dockerfile para ejecutar pruebas en local
+1. ```docker-compose up db -d``` Para iniciar el entorno con los requisitos, se opto por docker-compose y no solo Dockerfile para ejecutar pruebas en local
+2. Ejecutar las instrucciones 
 
-# 3. Prevenir degradación del modelo
+# 3. Pruebas
 
 mdoe 1
 {
@@ -137,6 +132,14 @@ mode 0
   "tempo": 125.513,
   "loudness": 125.513
 }
+
+no se ejecuta mis pruebas pytest de vscode, probablemente por que esta dentro de la subcarpeta app y se llama test.main.py. Puedes corregir mi settings.json? """{
+    "python.testing.pytestArgs": [
+        "app"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}"""
 
 
 Referencias:

@@ -14,11 +14,11 @@ from mlflow.models.signature import ModelSignature
 from sklearn.ensemble import GradientBoostingClassifier
 from mlflow.types.schema import Schema, ColSpec
 from mlflow.models.signature import ModelSignature
-
+from datetime import datetime
 from pytest_check import check
 
 from main import app
-from modelos import ModelSingleton
+from model_instances import ModelSingleton
 
 # Cliente para hacer las pruebas                                                                                                                                                                                                
 client = TestClient(app)
@@ -52,7 +52,7 @@ def test_inference_with_transform():
     columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
     df_train = df_train[columns_to_use]
 
-    columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale','tempo', 'reggaeton']
+    columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
     df_val = df_val[columns_to_use]
 
     # Primero obtenemos la información del modelo actual
@@ -75,7 +75,7 @@ def test_inference_with_transform():
 
         # Extraer las predicciones del JSON de respuesta
         json_response = response.json()
-        y_current_model_pred.append(json_response['class'])
+        y_current_model_pred.append(json_response['id'])
         y_current_model_val.append(row['reggaeton'])
     
     current_model_accuracy = accuracy_score(y_current_model_val, y_current_model_pred)
@@ -114,11 +114,15 @@ def test_inference_with_transform():
         random_state=0,subsample=0.8,n_estimators=300,warm_start=True,
         max_features='sqrt', min_samples_split=106,min_samples_leaf=177)
 
+    # Devuelvo a DataFrame para prevenir el Warning de usar feature names y mejorar la legibilidad y mantenimiento del código
+    df_train = pd.DataFrame(data=X_train, columns=[ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo'])
+
     # Entrenar el modelo con los nuevos datos de entrenamiento
-    classifier_GB.fit(X_train, y_train)
+    classifier_GB.fit(df_train, y_train)
 
     # para efectos de esta prueba, se guardara el experimento en MLflow pero, podria no hacerlo
-    with mlflow.start_run(experiment_id = experiment.experiment_id, run_name="Run_test"):
+    with mlflow.start_run(experiment_id = experiment.experiment_id, run_name=f"RunTest_{datetime.now()}"):
+
 
         # Logueo los mejores resultados
         mlflow.log_params({
@@ -130,9 +134,12 @@ def test_inference_with_transform():
             "MinMaxScaler_min": tempo_scaler.model.data_min_[0],
             "MinMaxScaler_max": tempo_scaler.model.data_max_[0]
         })
+        
+        # Logueo los resultados de la prueba# Devuelvo a DataFrame para prevenir el Warning de usar feature names y mejorar la legibilidad y mantenimiento del código
+        df_test = pd.DataFrame(data=X_train, columns=[ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo'])
 
         # Obtengo las predicciones
-        y_pred = classifier_GB.predict(X_test)
+        y_pred = classifier_GB.predict(df_test)
 
         # Calculo el acuraccy y el AUC
         new_model_accuracy = accuracy_score(y_test, y_pred)
@@ -169,6 +176,7 @@ def test_inference_with_transform():
         output_schema = Schema([ColSpec("integer")])
         signature = ModelSignature(inputs=input_schema, outputs=output_schema)
         input_example = [X_train[0]]
+
         # Log model & artifacts
         mlflow.sklearn.log_model(classifier_GB, f"Reggaeton_Classifier_V{version}",signature=signature, input_example=input_example)
 
