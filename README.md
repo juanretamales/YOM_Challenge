@@ -1,6 +1,6 @@
 # YOM Challenge
 
-El objetivo de esta prueba es entender tus habilidades para tomar un modelo hecho en localpor un Data Scientist y dejarlo en un ambiente simulado de producción.
+El objetivo de esta prueba es entender tus habilidades para tomar un modelo hecho en local por un Data Scientist y dejarlo en un ambiente simulado de producción.
 
 Los aspectos que evaluaremos son:
 ● Calidad del código (refactorización, orden, lógica, uso de patrones de diseño, etc)
@@ -13,12 +13,12 @@ Tienes bonus si:
 ● Creas mecanismos de monitoreo que permitan alertar cuando exista un deterioro del modelo
 ● Usas herramientas de automatización de creación de infraestructura
 
-La prueba consiste en tomar este challenge realizado para una prueba técnica https://github.com/iair/Spike_Challenge/tree/master hace varios años y modificarlo para que cumpla con los requerimientos presentados anteriormente.
-El objetivo del challenge inicial está especificado aquí, pero recuerda que tu objetivo no es resolver el problema de modelamiento sino que tomar lo que hizo este DS junior y dejarlo en algo que pueda ser pasado a producción.
+La prueba consiste en tomar [este challenge realizado para una prueba técnica](https://github.com/iair/Spike_Challenge) hace varios años y modificarlo para que cumpla con los requerimientos presentados anteriormente.
+[El objetivo del challenge inicial está especificado aquí](https://github.com/iair/Spike_Challenge/blob/master/Desaf%C3%ADo%20Spotify%20Reggaeton.pdf), pero recuerda que tu objetivo no es resolver el problema de modelamiento sino que tomar lo que hizo este DS junior y dejarlo en algo que pueda ser pasado a producción.
 
 # 1. Contexto
 
-Se busca poner en producción un modelo de sklearn que precide si una canción es de regaeton o no.
+Se busca poner en producción un modelo de sklearn que predice si una canción es de regaeton o no.
 
 ## 1.1 Patrón
 
@@ -60,8 +60,8 @@ flowchart LR
     style C color:#FFFFFF, stroke:#2962FF, fill:#2962FF
 ```
 
-### 1.2.1 MLflow para Tracking:
-Se decidio usar MLflow solo para tracking y no para el despliegue debido a:
+### 1.2.1 MLflow para Tracking
+Se decidió usar MLflow solo para tracking y no para el despliegue debido a:
 
 - Propósito Específico: MLflow está diseñado específicamente para el seguimiento y gestión del ciclo de vida de los experimentos de machine learning, incluyendo la experimentación, la reproducción de resultados y la comparación de modelos.
 - Versionado y Registro de Modelos: MLflow facilita el registro, versionado y almacenamiento de modelos, además de capturar métricas, parámetros y artefactos asociados a cada experimento.
@@ -70,7 +70,7 @@ Se decidio usar MLflow solo para tracking y no para el despliegue debido a:
 - Enfoque en Tracking: Mientras que MLflow es excelente para gestionar el ciclo de vida de los experimentos, no está optimizado para manejar solicitudes de alta frecuencia y baja latencia, como las que se esperan de una API en producción.
 - Carga y Recursos: Su infraestructura no está diseñada para soportar cargas intensivas de tráfico externo.
 
-### 1.2.2 FastAPI para Despliegue:
+### 1.2.2 FastAPI para Despliegue
 
 Se decidio usar FastAPI para el despliegue debido a:
 
@@ -82,6 +82,7 @@ que facilita el mantenimiento y la colaboración.
 - Configuración de Seguridad: Es más adecuado para configurar certificados SSL/TLS y gestionar conexiones seguras, algo crucial cuando se expone una API a usuarios externos.
 - Asincronía y Concurrencia: FastAPI utiliza ASGI (Asynchronous Server Gateway Interface) para manejar solicitudes de manera asíncrona, permitiendo un manejo eficiente de múltiples conexiones concurrentes.
 - Despliegue y Escalado: Es más sencillo desplegar FastAPI en servicios de orquestación y escalado automático como ElasticBeanstalk, lo que garantiza alta disponibilidad y balanceo de carga.
+- Se uso la biblioteca Slowapi para gestionar el uso de la API y prevenir posibles ataques.
 
 # 2. Instalación
 
@@ -112,19 +113,28 @@ que facilita el mantenimiento y la colaboración.
 4. Una vez que la aplicación esté en funcionamiento, puedes acceder a ella navegando a http://127.0.0.1:8001 en tu navegador.
 
 # 3. Pruebas
-Las pruebas estan en el archivo raiz para evitar problemas al momento de leer archivos importante como los modelos, importaciones y datasets. Se recomienda que los archivos se organicen en subdirectorios para facilitar la lectura y mantenimiento. Sin embargo, se priorizo las pruebas y otros objetivos mas importantes.
+Para iniciar todas las pruebas, abrir terminal dentro de app y ejecutar el siguiente comando:
+```bash
+pytest
+```
+Los archivos como modelos y dataset, estan en el archivo raiz para evitar problemas al momento de leer archivos.
 
-1. Archivo: test_main.py
+1. Archivo: test/test_main.py
 Este archivo probará el funcionamiento general de tu API.
 
-2. Archivo: test_inference.py
+1. Archivo: test/test_inference.py
 Este archivo probará la inferencia del modelo.
 
-3. Archivo: test_degrade_drift.py
+1. Archivo: test/test_degrade_drift.py
 Este archivo probará la degradación del modelo con un dataset como nueva_data.csv.
 
+# 4. Proximos pasos
+- Implementar un Reverse Proxy (Puede ser con NGINX y CertBot) para que la API tengo uso de SSL y que se pueda acceder desde cualquier lugar con conexion segura.
+- Decidir si usar MLflow para almacenar los modelos o usar un servicio de almacenamiento de modelos como Hugging Face o S3, este ultimo para no requerir el servidor de MLFlow para iniciar la API.
+- Añadir mas pruebas, como IsolationForest que se propuso pero no se implementó dentro del flujo de entrenamiento.
+- Ver la posibilidad de que el MinMaxScaler tambien este junto al modelo en MLFlow para que este versionado.
 
-# 4. Referencias
+# 5. Referencias
 - https://medium.com/@dast04/running-airflow-with-docker-compose-2023-for-machine-learning-a78eeadc00cd
 - https://github.com/sachua/mlflow-docker-compose/tree/master/mlflow
 - https://anderfernandez.com/blog/tutorial-mlflow-completo/

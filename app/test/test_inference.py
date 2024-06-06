@@ -1,4 +1,7 @@
 import os
+import sys
+# Añadir el directorio raíz del proyecto al sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi.testclient import TestClient
 import mlflow.pyfunc
@@ -6,6 +9,7 @@ import pandas as pd
 import requests
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 import json
+from pytest_check import check
 
 from main import app
 from model_instances import ModelSingleton
@@ -51,11 +55,20 @@ def test_inference_with_transform():
     precision = precision_score(y_val, y_pred, average='weighted')
     recall = recall_score(y_val, y_pred, average='weighted')
 
+    # Se uso 0.99 como valor de acuerdo a la data registrada en el entrenamiento
+    # Se podría intentar obtener de MLFlow pero por ahora se dejo con estos valores
+    check.greater_equal(accuracy, 0.99, "Comparar accuracy entre predicciones y el valor en entrenamiento")
+    check.greater_equal(precision, 0.99, "Comparar precision entre predicciones y el valor en entrenamiento")
+    check.greater_equal(recall, 0.99, "Comparar recall entre predicciones y el valor en entrenamiento")
     
-    assert accuracy>=0.99
-    assert precision>=0.99
-    assert recall>=0.99
-
-    # aseguro el rango de valores de entrada para el MinMaxScaler
-    assert tempo_scaler.model.data_min_[0]<=df['tempo'].min()
-    assert tempo_scaler.model.data_max_[0]>=df['tempo'].max()
+    # Revisamos si cambio la data de entrada para el MinMaxScaler
+    check.less_equal(
+        tempo_scaler.model.data_min_[0], 
+        df['tempo'].min(),
+        "Comparar el menor valor de los datos de entrada entre modelo y datos de prueba"
+    )
+    check.greater_equal(
+        tempo_scaler.model.data_max_[0], 
+        df['tempo'].max(),
+        "Comparar el mayor valor de los datos de entrada entre modelo y datos de prueba"
+    )

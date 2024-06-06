@@ -1,4 +1,7 @@
 import os
+import sys
+# Añadir el directorio raíz del proyecto al sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi.testclient import TestClient
 import mlflow 
@@ -24,7 +27,7 @@ from model_instances import ModelSingleton
 # Cliente para hacer las pruebas                                                                                                                                                                                                
 client = TestClient(app)
 
-def test_inference_with_transform():
+def test_degrade_drift():
     version="2" # Se usa version 2 por que es para un posible siguiente version
     experiment_name = f"Spike_Challenge_V{version}"
 
@@ -138,14 +141,14 @@ def test_inference_with_transform():
 
         # Calculo el acuraccy y el AUC
         new_model_accuracy = accuracy_score(y_test, y_pred)
-        new_model_aprecision = precision_score(y_test, y_pred, average='weighted')
+        new_model_precision = precision_score(y_test, y_pred, average='weighted')
         new_model_recall = recall_score(y_test, y_pred, average='weighted')
-        print(f'[Nuevo Modelo]Accuracy: {new_model_accuracy}\nPrecision: {new_model_aprecision}\nRecall: {new_model_recall}')
+        print(f'[Nuevo Modelo]Accuracy: {new_model_accuracy}\nPrecision: {new_model_precision}\nRecall: {new_model_recall}')
 
         # Log de parámetros
         metrics ={
             'new_accuracy': new_model_accuracy,
-            'new_precision':  new_model_aprecision, 
+            'new_precision':  new_model_precision, 
             'new_recall':  new_model_recall,
             "new_MinMaxScaler_min": new_tempo_scaler.data_min_[0],
             "new_MinMaxScaler_max": new_tempo_scaler.data_max_[0],
@@ -176,19 +179,23 @@ def test_inference_with_transform():
         mlflow.sklearn.log_model(classifier_GB, f"Reggaeton_Classifier_V{version}",signature=signature, input_example=input_example)
 
     # comparamos mmetricas
-    with check:
-        new_model_accuracy>=current_model_accuracy
-    with check:
-        new_model_aprecision>=current_model_precision
-    with check:
-        new_model_recall>=current_model_recall
+    check.greater_equal(new_model_accuracy, current_model_accuracy, "Comparar accuracy entre modelo nuevo y antiguo") 
+    check.greater_equal(new_model_precision, current_model_precision, "Comparar precision entre modelo nuevo y antiguo")
+    check.greater_equal(new_model_recall, current_model_recall, "Comparar recall entre modelo nuevo y antiguo")
     
-    # estas metricas se revisen para que la prueba falle y el personal correspondiente verifique si efectivamente hay que reemplazar el antiguo MinMaxScaler con el nuevo
-    with check:
-        new_tempo_scaler.data_min_[0]<=current_tempo_scaler.model.data_min_[0]
-    with check:
-        new_tempo_scaler.data_max_[0]>=current_tempo_scaler.model.data_max_[0]
-
+    # estas metricas se revisan y que el personal correspondiente verifique si 
+    # efectivamente hay que reemplazar el antiguo MinMaxScaler con el nuevo,
+    # ya que alertaria un posible cambio en los datos de entrada
+    check.less_equal(
+        new_tempo_scaler.data_min_[0], 
+        current_tempo_scaler.model.data_min_[0], 
+        "Comparar el menor valor de los datos de entrada entre scaler nuevo y antiguo"
+    )
+    check.greater_equal(
+        new_tempo_scaler.data_max_[0], 
+        current_tempo_scaler.model.data_max_[0], 
+        "Comparar el mayor valor de los datos de entrada entre scaler nuevo y antiguo"
+    )
 
     # se podria hacer mas pruebas sin usar transform como esta en ipynb pero 
     # se omitio en esta ocación por tiempo y dar prioridad a objetivos mas importantes

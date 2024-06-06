@@ -113,9 +113,9 @@ async def root(request: Request) -> RootResponse:
         message=settings.msg
     )
     if settings.flag_run:
-        return JSONResponse(content=response.dict(), status_code=200)
+        return JSONResponse(content=response.model_dump(), status_code=200)
     else:
-        return JSONResponse(content=response.dict(), status_code=500)
+        return JSONResponse(content=response.model_dump(), status_code=500)
 
 
 @limiter.limit("60/minute")
@@ -138,7 +138,7 @@ async def predict(request: Request, feature: Feature, transform: bool = True, ap
             message="The credentials are not valid", 
             time_took=time_took
         )
-        return JSONResponse(response.dict(), status_code=401)
+        return JSONResponse(response.model_dump(), status_code=401)
     try:
         model_instance = ModelSingleton(MODEL_URI)
 
@@ -169,7 +169,7 @@ async def predict(request: Request, feature: Feature, transform: bool = True, ap
             message='Ok', 
             time_took=time_took
         )
-        return JSONResponse(response.dict(), status_code=200)  # Cambié el código de estado a 200
+        return JSONResponse(response.model_dump(), status_code=200)  # Cambié el código de estado a 200
     except Exception as e:
         settings.flag_run = False
         settings.msg = f"Found a unexpected error, {str(r)}"
@@ -183,4 +183,4 @@ async def predict(request: Request, feature: Feature, transform: bool = True, ap
             message=str(e), 
             time_took=time_took
         )
-        return JSONResponse(response.dict(), status_code=500)
+        return JSONResponse(response.model_dump(), status_code=500)
