@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from mlflow.types.schema import Schema, ColSpec
 from mlflow.models.signature import ModelSignature
 from sklearn.ensemble import GradientBoostingClassifier
@@ -24,7 +25,7 @@ from model_instances import ModelSingleton
 client = TestClient(app)
 
 def test_inference_with_transform():
-    version="1"
+    version="2"
     experiment_name = f"Spike_Challenge_V{version}"
 
     if not mlflow.get_experiment_by_name(experiment_name):
@@ -48,12 +49,12 @@ def test_inference_with_transform():
     df_val = df.sample(int(len(df)*0.2))
     df_train = df[~df.index.isin(df_val.index)]
 
-    # Drop unnecessary columns
-    columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
-    df_train = df_train[columns_to_use]
+    # # Drop unnecessary columns
+    # columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
+    # df_train = df_train[columns_to_use]
 
-    columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
-    df_val = df_val[columns_to_use]
+    # columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
+    # df_val = df_val[columns_to_use]
 
     # Primero obtenemos la información del modelo actual
     y_current_model_pred=[] # guardo resultados
@@ -81,11 +82,8 @@ def test_inference_with_transform():
     current_model_accuracy = accuracy_score(y_current_model_val, y_current_model_pred)
     current_model_precision = precision_score(y_current_model_val, y_current_model_pred, average='weighted')
     current_model_recall = recall_score(y_current_model_val, y_current_model_pred, average='weighted')
+    print(f'[Nuevo Modelo]Accuracy: {current_model_accuracy}\nPrecision: {current_model_precision}\nRecall: {current_model_recall}')
 
-    # se podria validar con assert, pero como ya esta la prueba en test_degrade.py, se desactivo
-    # assert current_model_accuracy>=0.99
-    # assert current_model_precision>=0.99
-    # assert current_model_recall>=0.99
 
     # sin embargo, para el MinMaxScaler, se mantuvo ya que es mas facil que cambie el rango de entrada
     with check:
@@ -95,7 +93,11 @@ def test_inference_with_transform():
 
     # Ahora se entrena un nuevo modelo con el dataset leido
     new_tempo_scaler = MinMaxScaler()
-    df_train.loc[:, 'tempo_scale'] = new_tempo_scaler.fit_transform(df_train[['tempo']].values)
+    df_train.loc[:, 'tempo'] = new_tempo_scaler.fit_transform(df_train[['tempo']].values)
+
+    # Drop unnecessary columns
+    columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo', 'reggaeton']
+    df_train = df_train[columns_to_use]
 
     # separo entre caracteristivas y objetivo
     X = df_train.loc[:, df_train.columns != 'reggaeton'].values
@@ -131,12 +133,12 @@ def test_inference_with_transform():
             "learning_rate": classifier_GB.learning_rate,
             "train_length": len(X_train),
             "test_length": len(X_test),
-            "MinMaxScaler_min": tempo_scaler.model.data_min_[0],
-            "MinMaxScaler_max": tempo_scaler.model.data_max_[0]
+            "MinMaxScaler_min": new_tempo_scaler.data_min_[0],
+            "MinMaxScaler_max": new_tempo_scaler.data_max_[0]
         })
         
         # Logueo los resultados de la prueba# Devuelvo a DataFrame para prevenir el Warning de usar feature names y mejorar la legibilidad y mantenimiento del código
-        df_test = pd.DataFrame(data=X_train, columns=[ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo'])
+        df_test = pd.DataFrame(data=X_test, columns=[ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo'])
 
         # Obtengo las predicciones
         y_pred = classifier_GB.predict(df_test)
@@ -145,15 +147,15 @@ def test_inference_with_transform():
         new_model_accuracy = accuracy_score(y_test, y_pred)
         new_model_aprecision = precision_score(y_test, y_pred, average='weighted')
         new_model_recall = recall_score(y_test, y_pred, average='weighted')
-        print(f'Accuracy: {accuracy}\nPrecision: {precision}\nRecall: {recall}')
+        print(f'[Nuevo Modelo]Accuracy: {new_model_accuracy}\nPrecision: {new_model_aprecision}\nRecall: {new_model_recall}')
 
         # Log de parámetros
         metrics ={
             'new_accuracy': new_model_accuracy,
             'new_precision':  new_model_aprecision, 
             'new_recall':  new_model_recall,
-            "new_MinMaxScaler_min": tempo_scaler.model.data_min_[0],
-            "new_MinMaxScaler_max": tempo_scaler.model.data_max_[0],
+            "new_MinMaxScaler_min": new_tempo_scaler.data_min_[0],
+            "new_MinMaxScaler_max": new_tempo_scaler.data_max_[0],
             'current_accuracy': current_model_accuracy,
             'current_precision': current_model_precision,
             'current_recall': current_model_recall,
@@ -190,9 +192,9 @@ def test_inference_with_transform():
     
     # estas metricas se revisen para que la prueba falle y el personal correspondiente verifique si efectivamente hay que reemplazar el antiguo MinMaxScaler con el nuevo
     with check:
-        tempo_scaler.model.data_min_[0]<=current_tempo_scaler.model.data_min_[0]
+        new_tempo_scaler.data_min_[0]<=current_tempo_scaler.model.data_min_[0]
     with check:
-        tempo_scaler.model.data_max_[0]>=current_tempo_scaler.model.data_max_[0]
+        new_tempo_scaler.data_max_[0]>=current_tempo_scaler.model.data_max_[0]
 
 
 
