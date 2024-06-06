@@ -7,3 +7,4 @@ slowapi==0.1.9
 uvicorn==0.30.0 
 fastapi==0.111.0 
 pydantic-settings
+pytest-check==2.3.1 
