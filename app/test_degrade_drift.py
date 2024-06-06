@@ -25,7 +25,7 @@ from model_instances import ModelSingleton
 client = TestClient(app)
 
 def test_inference_with_transform():
-    version="2"
+    version="2" # Se usa version 2 por que es para un posible siguiente version
     experiment_name = f"Spike_Challenge_V{version}"
 
     if not mlflow.get_experiment_by_name(experiment_name):
@@ -48,13 +48,6 @@ def test_inference_with_transform():
     # cuando aun es dataframe, separo para obtener el de validación para hacer pruebas posteriores
     df_val = df.sample(int(len(df)*0.2))
     df_train = df[~df.index.isin(df_val.index)]
-
-    # # Drop unnecessary columns
-    # columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
-    # df_train = df_train[columns_to_use]
-
-    # columns_to_use = [ 'danceability', 'energy', 'speechiness', 'acousticness','valence','tempo_scale', 'reggaeton']
-    # df_val = df_val[columns_to_use]
 
     # Primero obtenemos la información del modelo actual
     y_current_model_pred=[] # guardo resultados
@@ -195,7 +188,6 @@ def test_inference_with_transform():
         new_tempo_scaler.data_min_[0]<=current_tempo_scaler.model.data_min_[0]
     with check:
         new_tempo_scaler.data_max_[0]>=current_tempo_scaler.model.data_max_[0]
-
 
 
     # se podria hacer mas pruebas sin usar transform como esta en ipynb pero 
