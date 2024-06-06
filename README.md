@@ -85,64 +85,46 @@ que facilita el mantenimiento y la colaboración.
 
 # 2. Instalación
 
-Se recomienda el uso de Docker, para ello instalarlo previamente
+## Requisitos Previos
+1. Tener Docker y Docker Compose instalados en tu sistema.
+2. Clonar el repositorio de tu proyecto.
 
-1. ```docker-compose up db -d``` Para iniciar el entorno con los requisitos, se opto por docker-compose y no solo Dockerfile para ejecutar pruebas en local
-2. Ejecutar las instrucciones 
+## Pasos de Instalación
+1. Iniciar MLflow con Docker Compose
+   1. Navega al directorio raíz de tu proyecto donde se encuentra el archivo docker-compose.yml.
+   2. Ejecuta el siguiente comando para iniciar MLflow en segundo plano: ```docker-compose up mlflow -d```
+2. Entrenar el Modelo y Enviar a MLflow
+   1. Abre el archivo train_model_and_send_mlflow.ipynb que se encuentra en la carpeta app.
+   2. Sigue las instrucciones dentro del notebook para entrenar tu modelo. Esto generará el archivo tempo_min_max_scaler.save y creará un experimento dentro de MLflow.
+3. Registrar el Modelo en MLflow
+   1. Abre MLflow en tu navegador accediendo a http://127.0.0.1:5000.
+   2. Dentro de la interfaz de MLflow, registra el modelo bajo el nombre Reggaeton_Classifier_V1.0. Si decides cambiar el nombre del modelo, asegúrate de actualizar los códigos correspondientes en los archivos de tu proyecto para reflejar este cambio.
+4. Iniciar la Aplicación FastAPI
+   1. Puedes iniciar tu aplicación de FastAPI de dos maneras: usando Docker o de manera local.
+
+### Opción 1: Usar Docker
+1. En el directorio raíz de tu proyecto, ejecuta el siguiente comando para iniciar la API en el puerto 8001: ````docker-compose up api -d```
+2. Una vez que la aplicación esté en funcionamiento, puedes acceder a ella navegando a http://127.0.0.1:8001 en tu navegador.
+### Opción 2: Iniciar de Manera Local
+1. Crea una variable de entorno si es necesario. Por ejemplo, puedes crear un archivo .env en el directorio raíz de tu proyecto y definir tus variables de entorno allí.
+2. Instala las dependencias de tu proyecto ejecutando: ```pip install -r requirements.txt```
+3. Inicia la aplicación FastAPI ejecutando: ```uvicorn app.main:app --host 0.0.0.0 --port 8001```
+4. Una vez que la aplicación esté en funcionamiento, puedes acceder a ella navegando a http://127.0.0.1:8001 en tu navegador.
 
 # 3. Pruebas
+Las pruebas estan en el archivo raiz para evitar problemas al momento de leer archivos importante como los modelos, importaciones y datasets. Se recomienda que los archivos se organicen en subdirectorios para facilitar la lectura y mantenimiento. Sin embargo, se priorizo las pruebas y otros objetivos mas importantes.
 
-mdoe 1
-{
-  "danceability": 0.61,
-  "energy": 0.88,
-  "speechiness": 0.06,
-  "acousticness": 0.00,
-  "valence": 0.46,
-  "tempo": 131.06,
-  "loudness": -4.43
-}
-mode 0
-{
-  "danceability": 0.62,
-  "energy": 0.77,
-  "speechiness": 0.11,
-  "acousticness": 0.04,
-  "valence": 0.55,
-  "tempo": 180.00,
-  "loudness": -5.59
-}
-1
-{
-  "danceability": 0.641,
-  "energy": 0.693,
-  "speechiness": 0.163,
-  "acousticness": 0.0169,
-  "valence": 0.899,
-  "tempo": 214.058,
-  "loudness": -7.327
-}
-0
-{
-  "danceability": 0.512,
-  "energy": 0.541,
-  "speechiness": 0.141,
-  "acousticness": 0.781,
-  "valence": 0.941,
-  "tempo": 125.513,
-  "loudness": 125.513
-}
+1. Archivo: test_main.py
+Este archivo probará el funcionamiento general de tu API.
 
-no se ejecuta mis pruebas pytest de vscode, probablemente por que esta dentro de la subcarpeta app y se llama test.main.py. Puedes corregir mi settings.json? """{
-    "python.testing.pytestArgs": [
-        "app"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
-}"""
+2. Archivo: test_inference.py
+Este archivo probará la inferencia del modelo.
+
+3. Archivo: test_degrade_drift.py
+Este archivo probará la degradación del modelo con un dataset como nueva_data.csv.
 
 
-Referencias:
-https://medium.com/@dast04/running-airflow-with-docker-compose-2023-for-machine-learning-a78eeadc00cd
-https://github.com/sachua/mlflow-docker-compose/tree/master/mlflow
-https://anderfernandez.com/blog/tutorial-mlflow-completo/
+# 4. Referencias
+- https://medium.com/@dast04/running-airflow-with-docker-compose-2023-for-machine-learning-a78eeadc00cd
+- https://github.com/sachua/mlflow-docker-compose/tree/master/mlflow
+- https://anderfernandez.com/blog/tutorial-mlflow-completo/
