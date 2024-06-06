@@ -43,5 +43,3 @@ archive.zip
 /yolo_signature_detection.pt
 *.pt
 /app/mlruns
-
-*.save
