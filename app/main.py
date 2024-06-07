@@ -30,7 +30,7 @@ if os.path.isfile('redoc.md'):
 class Settings(BaseSettings):
     app_name: str = "Reggaeton Classifier API"
     description: str = description_file
-    version: str = "1.0.0"
+    version: str = "1.0.1"
     msg: str = f"Start on {dt.datetime.now()}"
     flag_run: bool = True
 
