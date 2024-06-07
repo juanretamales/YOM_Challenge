@@ -3,15 +3,15 @@
 El objetivo de esta prueba es entender tus habilidades para tomar un modelo hecho en local por un Data Scientist y dejarlo en un ambiente simulado de producción.
 
 Los aspectos que evaluaremos son:
-● Calidad del código (refactorización, orden, lógica, uso de patrones de diseño, etc)
-● Capacidad de implementar herramientas que permitan aplicar los principios de ML-Ops al proyecto en producción (recomendamos Neptune o ML Flow)
-● Uso de alguna herramienta que permita contener el ambiente creado para la ejecución y hacerlo reproducible fácilmente para alguien que quiera ejecutarlo
-● Documentación clara y fácil de leer
+- Calidad del código (refactorización, orden, lógica, uso de patrones de diseño, etc)
+- Capacidad de implementar herramientas que permitan aplicar los principios de ML-Ops al proyecto en producción (recomendamos Neptune o ML Flow)
+- Uso de alguna herramienta que permita contener el ambiente creado para la ejecución y hacerlo reproducible fácilmente para alguien que quiera ejecutarlo
+- Documentación clara y fácil de leer
 
 Tienes bonus si:
-● Específicas cómo vas a abordar la interacción del modelo con el mundo real y nos explicas cómo vas a prevenir la degradación del modelo
-● Creas mecanismos de monitoreo que permitan alertar cuando exista un deterioro del modelo
-● Usas herramientas de automatización de creación de infraestructura
+- Específicas cómo vas a abordar la interacción del modelo con el mundo real y nos explicas cómo vas a prevenir la degradación del modelo
+- Creas mecanismos de monitoreo que permitan alertar cuando exista un deterioro del modelo
+- Usas herramientas de automatización de creación de infraestructura
 
 La prueba consiste en tomar [este challenge realizado para una prueba técnica](https://github.com/iair/Spike_Challenge) hace varios años y modificarlo para que cumpla con los requerimientos presentados anteriormente.
 [El objetivo del challenge inicial está especificado aquí](https://github.com/iair/Spike_Challenge/blob/master/Desaf%C3%ADo%20Spotify%20Reggaeton.pdf), pero recuerda que tu objetivo no es resolver el problema de modelamiento sino que tomar lo que hizo este DS junior y dejarlo en algo que pueda ser pasado a producción.
@@ -99,12 +99,15 @@ que facilita el mantenimiento y la colaboración.
    2. Sigue las instrucciones dentro del notebook para entrenar tu modelo. Esto generará el archivo tempo_min_max_scaler.save y creará un experimento dentro de MLflow.
 3. Registrar el Modelo en MLflow
    1. Abre MLflow en tu navegador accediendo a http://127.0.0.1:5000.
-   2. Dentro de la interfaz de MLflow, registra el modelo bajo el nombre Reggaeton_Classifier_V1.0. Si decides cambiar el nombre del modelo, asegúrate de actualizar los códigos correspondientes en los archivos de tu proyecto para reflejar este cambio.
+   2. Dentro de la interfaz de MLflow, registra el modelo bajo el nombre Reggaeton_Classifier_V1.0. Si decides cambiar el nombre del modelo, asegúrate de actualizar los códigos correspondientes en los archivos de tu proyecto para reflejar este cambio. Si sabes lo que haces, puedes solo intentar cambiar la variable de entorno MODEL_URI en el archivo .env o docker-compose.yml.
 4. Iniciar la Aplicación FastAPI
    1. Puedes iniciar tu aplicación de FastAPI de dos maneras: usando Docker o de manera local.
+   2. Por falta de tiempo, se uso una apikey fija la cual es ```kXwagyJkMH0Q3fT3MorqmRupqpjq1FCsVijy2P3nwrQQpExcWl``` y esta en en el endpoint predict, ya que se pretende evitar el uso no deseado de la API.
+
+Nota: si usas MLflow en otro servidor, debes cambiar la variable de entorno MLFLOW_URI en el archivo .env o docker-compose.yml.
 
 ### Opción 1: Usar Docker
-1. En el directorio raíz de tu proyecto, ejecuta el siguiente comando para iniciar la API en el puerto 8001: ````docker-compose up api -d```
+1. En el directorio raíz de tu proyecto, ejecuta el siguiente comando para iniciar la API en el puerto 8001: ```docker-compose up api -d```
 2. Una vez que la aplicación esté en funcionamiento, puedes acceder a ella navegando a http://127.0.0.1:8001 en tu navegador.
 ### Opción 2: Iniciar de Manera Local
 1. Crea una variable de entorno si es necesario. Por ejemplo, puedes crear un archivo .env en el directorio raíz de tu proyecto y definir tus variables de entorno allí.
@@ -133,6 +136,7 @@ Este archivo probará la degradación del modelo con un dataset como nueva_data.
 - Decidir si usar MLflow para almacenar los modelos o usar un servicio de almacenamiento de modelos como Hugging Face o S3, este ultimo para no requerir el servidor de MLFlow para iniciar la API.
 - Añadir mas pruebas, como IsolationForest que se propuso pero no se implementó dentro del flujo de entrenamiento.
 - Ver la posibilidad de que el MinMaxScaler tambien este junto al modelo en MLFlow para que este versionado.
+- Añadir un sistema de tokens o administrador de credenciales para evitar el uso no deseado de la API.
 
 # 5. Referencias
 - https://medium.com/@dast04/running-airflow-with-docker-compose-2023-for-machine-learning-a78eeadc00cd

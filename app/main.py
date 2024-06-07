@@ -112,6 +112,7 @@ async def root(request: Request) -> RootResponse:
         status="Online" if settings.flag_run else "Offline",
         message=settings.msg
     )
+    # Si logro cargar el modelo, se muestra el mensaje de conexión correcta
     if settings.flag_run:
         return JSONResponse(content=response.model_dump(), status_code=200)
     else:
@@ -126,7 +127,9 @@ async def predict(request: Request, feature: Feature, transform: bool = True, ap
     # Se captura el tiempo de inicio para calcular el tiempo total
     start_time = dt.datetime.now()
 
-    # Por falta de tiempo, solo se usará una apikey fija, se recomienda usar token o un administrador
+    # Por falta de tiempo, solo se usará una apikey fija, se recomienda añadir 
+    # un sistema de tokens o administrador de credenciales para evitar el uso 
+    # no deseado de la API.
     if apikey != "kXwagyJkMH0Q3fT3MorqmRupqpjq1FCsVijy2P3nwrQQpExcWl":
         # Se captura el tiempo de finalización para calcular el tiempo total
         finish_time = dt.datetime.now()
@@ -135,7 +138,7 @@ async def predict(request: Request, feature: Feature, transform: bool = True, ap
         response = PredictionResponse(
             predictions=None, 
             id=None, 
-            message="The credentials are not valid", 
+            message="Your API credentials are incorrect", 
             time_took=time_took
         )
         return JSONResponse(response.model_dump(), status_code=401)
