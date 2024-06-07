@@ -13,7 +13,7 @@ class ModelSingleton:
     _instances = {}
     _lock = Lock()
 
-    def __new__(cls, model_path):
+    def __new__(cls, model_path:str):
         """
         Método de creación de una nueva instancia, siguiendo el patrón Singleton por modelo.
         
@@ -30,7 +30,7 @@ class ModelSingleton:
         return cls._instances[model_path]
 
     @staticmethod
-    def _load_model(model_path):
+    def _load_model(model_path:str):
         """
         Carga el modelo desde MLflow o desde una ruta de archivo local.
         

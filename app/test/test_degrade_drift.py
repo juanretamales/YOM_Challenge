@@ -37,7 +37,9 @@ def test_degrade_drift():
     experiment = mlflow.get_experiment_by_name(experiment_name)
 
     # Setup de MLflow
-    mlflow.set_tracking_uri('http://127.0.0.1:5000/')
+    MLFLOW_URI = os.getenv("MLFLOW_URI", "http://127.0.0.1:5000/")
+    mlflow.set_tracking_uri(uri=MLFLOW_URI)
+
     
     apikey = "kXwagyJkMH0Q3fT3MorqmRupqpjq1FCsVijy2P3nwrQQpExcWl"
     
@@ -179,6 +181,8 @@ def test_degrade_drift():
         mlflow.sklearn.log_model(classifier_GB, f"Reggaeton_Classifier_V{version}",signature=signature, input_example=input_example)
 
     # comparamos mmetricas
+    # Se podria agregar un umbral de aceptación para evitar que falle pruebas 
+    # por los decimales en las metricas
     check.greater_equal(new_model_accuracy, current_model_accuracy, "Comparar accuracy entre modelo nuevo y antiguo") 
     check.greater_equal(new_model_precision, current_model_precision, "Comparar precision entre modelo nuevo y antiguo")
     check.greater_equal(new_model_recall, current_model_recall, "Comparar recall entre modelo nuevo y antiguo")
@@ -186,12 +190,12 @@ def test_degrade_drift():
     # estas metricas se revisan y que el personal correspondiente verifique si 
     # efectivamente hay que reemplazar el antiguo MinMaxScaler con el nuevo,
     # ya que alertaria un posible cambio en los datos de entrada
-    check.less_equal(
+    check.greater_equal(
         new_tempo_scaler.data_min_[0], 
         current_tempo_scaler.model.data_min_[0], 
         "Comparar el menor valor de los datos de entrada entre scaler nuevo y antiguo"
     )
-    check.greater_equal(
+    check.less_equal(
         new_tempo_scaler.data_max_[0], 
         current_tempo_scaler.model.data_max_[0], 
         "Comparar el mayor valor de los datos de entrada entre scaler nuevo y antiguo"
